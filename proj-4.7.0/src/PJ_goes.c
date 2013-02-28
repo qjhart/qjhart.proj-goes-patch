@@ -161,7 +161,17 @@ static XY e_post11_forward(LP lp, PJ *P) {
   
   if(P->row_col != 0) {
     int row_sign = (P->row_col < 0)?-1:1;
+#if 1
     evsc2lp_double(1, 1, elev_y, scan_x, &xy.y,&xy.x, &P->cilpevsc);
+#else
+    int iscan,idet,line,ipix;
+    float offln,offpx;
+    lnpxevsc(P->instr, P->flip, elev_y, scan_x,
+	     &iscan,&idet,&line,&ipix,
+	     &offln, &offpx, &P->cilpevsc);    
+      xy.x = ipix+offpx;
+      xy.y = line+offln;
+#endif
     xy.y *= row_sign;
     xy.x = ((xy.x / P->fr_meter) - P->x0) / P->a;
     xy.y = ((xy.y / P->fr_meter) - P->y0) / P->a;
@@ -183,18 +193,15 @@ static LP e_post11_inverse(XY xy, PJ *P) {
   if(P->row_col != 0) {
     /* Convert XY to Elev,Scan */
     /* x=pix y=rline */
-    int iscan,idet,line,ipix;
-    float offln,offpx;
     int row_sign = (P->row_col < 0)?-1:1;
     /* Fix back to Row-Col */
     scan_x = P->fr_meter * (P->a * xy.x + P->x0);
     elev_y = P->fr_meter * (P->a * xy.y + P->y0);
     elev_y *= row_sign;
-    lnpxevsc(P->instr, P->flip, elev_y, scan_x,
-	     &iscan,&idet,&line,&ipix,
-	     &offln, &offpx, &P->cilpevsc);
-      se.u = ipix+offpx;
-      se.v = line+offln;
+
+  /* NOAA uses a different instr numbering */
+	se.u = scpx(P->instr+1,P->flip,scan_x,&P->cilpevsc);
+	se.v = evln(P->instr+1,P->flip,elev_y,&P->cilpevsc);
     } else {
     /* This is to match PJ_geos */
     se.u = tan (xy.x / (P->r-1.0));
@@ -513,6 +520,19 @@ static PJ * setup_row_col(PJ *P) {
       P->ewinc=1402;
     }
     break;
+  case(15):                                            /* recheck */
+    if (P->instr==0) {
+      P->nscyc=4;
+      P->nsinc=2970;
+      P->ewcyc=2;
+      P->ewinc=3035;
+    } else {						/* SOUNDER is WRONG */
+      P->nscyc=4;
+      P->nsinc=1402;
+      P->ewcyc=2;
+      P->ewinc=1402;
+    }
+    break;
   default:
     E_ERROR(-1);
   }
@@ -635,7 +655,6 @@ switch(P->goes) {
    P->noaa=1;
    P->imc=0;
    break;
-
  case(10):
     P->lam=-135*atan(1)/45;
     P->dr = 0;
@@ -645,6 +664,14 @@ switch(P->goes) {
     P->imc=1;
     break;
  case(11):
+   P->lam=-135*atan(1)/45;
+    P->dr = 0;
+    P->phi= 0;
+    P->psi= 0;
+    P->noaa=0;
+    P->imc=1;
+   break;
+ case(15):
    P->lam=-135*atan(1)/45;
     P->dr = 0;
     P->phi= 0;
