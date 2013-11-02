@@ -520,13 +520,13 @@ static PJ * setup_row_col(PJ *P) {
       P->ewinc=1402;
     }
     break;
-  case(15):                                            /* recheck */
+  case(15):
     if (P->instr==0) {
       P->nscyc=4;
-      P->nsinc=2970;
+      P->nsinc=3012;
       P->ewcyc=2;
-      P->ewinc=3035;
-    } else {						/* SOUNDER is WRONG */
+      P->ewinc=3127;
+    } else {
       P->nscyc=4;
       P->nsinc=1402;
       P->ewcyc=2;
