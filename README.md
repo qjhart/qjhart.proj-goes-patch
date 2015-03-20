@@ -15,7 +15,7 @@ RedHat comes with a standard proj package.  This is the package that is used for
 ```
 #!bash
 # Checkout the proj patch
-hg clone https://code.google.com/p/qjhart.proj-goes-patch/
+git clone https://github.com/qjhart/qjhart.proj-goes-patch.git
 # First get the proj source and build environment
 mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
@@ -30,6 +30,16 @@ rsync -a -v ~/qjhart.proj-goes-patch/rpmbuild/ ~/rpmbuild/
 rpmbuild -ba rpmbuild/SPECS/proj.spec
 # install these sources
 (cd ~/rpmbuild/RPMS/x86_64/; sudo rpm -Uvh --force proj-*.rpm)
+```
+
+Responds with:
+```
+Preparing...                ########################################### [100%]
+   1:proj-epsg              ########################################### [ 20%]
+   2:proj                   ########################################### [ 40%]
+   3:proj-devel             ########################################### [ 60%]
+   4:proj-nad               ########################################### [ 80%]
+   5:proj-debuginfo         ########################################### [100%]
 ```
 
 You now have a set of packages that can be installed in any matching redhat distribution.
