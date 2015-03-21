@@ -7,6 +7,11 @@ PROJ.4 utilities (e.g. cs2cs), and also allows for the inclusion of
 other software that use the libproj library for projections, like
 GRASS.
 
+Debian and RedHat comes with a standard proj package.  This is the package that
+is used for projecting between coordinate systems in grass, among
+other software packages.  A patched version of the software needs to
+applied to the systems, for the GOES projection.
+
 # Software
 
 This patch adds a new projection +proj=goes, corresponding to NOAA
@@ -47,11 +52,8 @@ sudo dpkg --install *proj*.deb
 
 ## RedHat
 
-RedHat comes with a standard proj package.  This is the package that
-is used for projecting between coordinate systems in grass, among
-other software packages.  A patched version of the software needs to
-applied to the systems, for the GOES projection.
-http://bradthemad.org/tech/notes/patching_rpms.php provides insight on
+We can use the same patch for the redhat patch.
+http://bradthemad.org/tech/notes/patching_rpms.php provides some insight on
 how to do this.
 
 ```
@@ -67,11 +69,40 @@ sudo yum install rpm-build redhat-rpm-config
 yumdownloader --source proj
 rpm -ivh proj-4.7.0-2_0.el6.src.rpm
 # Copy the patch to the rpmbuild directory
-rsync -a -v ~/qjhart.proj-goes-patch/rpmbuild/ ~/rpmbuild/
-# Build the package (if this fails you made need to install more dependencies)
+cp ~/qjhart.proj-goes-patch/rpmbuild/add-goes-4.7 ~/rpmbuild/SOURCES
+```
+
+Now you need to add the patch to the ~/rpmbuild/SPEC/proj.spec file.
+You need to add two lines, see below for those diffs.  These are the
+changes to the proj.spec files
+
+```{bash}
+--- /home/qhart/rpmbuild/SPECS/proj.spec        2011-11-08 11:47:16.000000000 -0800
++++ /home/qhart/rpmbuild/SPECS/proj.spec+       2015-03-20 18:53:38.460888519 -0700
+@@ -9,6 +9,7 @@
+ Source0:   http://download.osgeo.org/proj/proj-%{version}.tar.gz
+ Source1:   http://download.osgeo.org/proj/proj-datumgrid-1.5.zip
+ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
++Patch0: add-goes-4.7
+
+ BuildRequires: libtool
+ Requires: %{name}-epsg = %{version}-%{release}
+@@ -44,6 +45,7 @@
+
+ %prep
+ %setup -q
++%patch0 -p1
+
+ # disable internal libtool to avoid hardcoded r-path
+ for makefile in `find . -type f -name 'Makefile.in'`; do
+```
+
+Then, build the package (if this fails you made need to install more dependencies)
+
+```{bash}
 rpmbuild -ba rpmbuild/SPECS/proj.spec
 # install these sources
-(cd ~/rpmbuild/RPMS/x86_64/; sudo rpm -Uvh --force proj-*.rpm)
+sudo rpm -Uvh --force ~/rpmbuild/RPMS/x86_64/proj-*.rpm
 ```
 
 Responds with:
@@ -85,7 +116,13 @@ Preparing...                ########################################### [100%]
 ```
 
 You now have a set of packages that can be installed in any matching
-redhat distribution.
+redhat distribution.  You can check with 
+
+```
+proj +proj=goes +goes=15
+```
+
+Should not fail
  
 # History
 
