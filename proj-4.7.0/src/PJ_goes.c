@@ -526,7 +526,33 @@ static PJ * setup_row_col(PJ *P) {
       P->nsinc=3012;
       P->ewcyc=2;
       P->ewinc=3127;
-    } else {
+    } else {						/* SOUNDER is WRONG */
+      P->nscyc=4;
+      P->nsinc=1402;
+      P->ewcyc=2;
+      P->ewinc=1402;
+    }
+    break;
+  case(1506):
+    if (P->instr==0) {
+      P->nscyc=4;
+      P->nsinc=3124;
+      P->ewcyc=2;
+      P->ewinc=3009;
+    } else {						/* SOUNDER is WRONG */
+      P->nscyc=4;
+      P->nsinc=1402;
+      P->ewcyc=2;
+      P->ewinc=1402;
+    }
+    break;
+  case(1512):
+    if (P->instr==0) {
+      P->nscyc=4;
+      P->nsinc=3012;
+      P->ewcyc=2;
+      P->ewinc=3127;
+    } else {						/* SOUNDER is WRONG */
       P->nscyc=4;
       P->nsinc=1402;
       P->ewcyc=2;
@@ -672,6 +698,22 @@ switch(P->goes) {
     P->imc=1;
    break;
  case(15):
+   P->lam=-135*atan(1)/45;
+    P->dr = 0;
+    P->phi= 0;
+    P->psi= 0;
+    P->noaa=1;
+    P->imc=1;
+   break;
+ case(1506):
+   P->lam=-135*atan(1)/45;
+    P->dr = 0;
+    P->phi= 0;
+    P->psi= 0;
+    P->noaa=1;
+    P->imc=1;
+   break;
+ case(1512):
    P->lam=-135*atan(1)/45;
     P->dr = 0;
     P->phi= 0;

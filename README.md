@@ -1,16 +1,58 @@
 # Introduction
 
-This project supplies a patch for the inclusion of NOAA GOES satellites into the PROJ.4 http://trac.osgeo.org/proj/ library and binary.  This allows projections to and from GOES using the standard PROJ.4 utilities (e.g. cs2cs), and also allows for the inclusion of other software that use the libproj library for projections, like GRASS.
+This project supplies a patch for the inclusion of NOAA GOES
+satellites into the PROJ.4 http://trac.osgeo.org/proj/ library and
+binary.  This allows projections to and from GOES using the standard
+PROJ.4 utilities (e.g. cs2cs), and also allows for the inclusion of
+other software that use the libproj library for projections, like
+GRASS.
 
 # Software
 
-This patch adds a new projection +proj=goes, corresponding to NOAA GOES satellites.  The following flags are associated with the the projection
+This patch adds a new projection +proj=goes, corresponding to NOAA
+GOES satellites.  The following flags are associated with the the
+projection:
+* +proj=goes
+* +goes=15
+  * (or +goes=1506 for summer flip ~MAR20-SEP20)
+  * (or +goes=1512 for winter flip ~ SEP20-MAR20 )
+* +nsinc
+* +ewinc
+
+if you have *gvar_inspector* installed, you can get the projection
+information form a GVAR file, with the *--proj* command-line.
 
 # Compiling
 
+## debian
+
+The debian patch uses quilting,
+http://wiki.debian.org/UsingQuilt#Using_quilt_with_Debian_source_packages
+as the methodology for adding the patch.  Note that below the
+qjhart.proj-goes-patch/proj-4.7.0/ directory contains some files in
+the src/ directory, but those are for info only, their source is
+included in the patch, and the patch is the cannonical format.
+
+```
+#!bash
+# Checkout the proj patch, get location.
+gh=~/qjhart.proj-goes-patch
+# Get the proj source
+apt-get source proj
+# Copy apply the patch and build
+(cd proj-4.7.0; quilt import $gh/add-goes-4.7; dpkg-buildpackage)
+# install these sources
+sudo dpkg --install *proj*.deb
+```
+
 ## RedHat
 
-RedHat comes with a standard proj package.  This is the package that is used for projecting between coordinate systems in grass, among other software packages.  A patched version of the software needs to applied to the systems, for the GOES projection.  http://bradthemad.org/tech/notes/patching_rpms.php provides insight on how to do this.
+RedHat comes with a standard proj package.  This is the package that
+is used for projecting between coordinate systems in grass, among
+other software packages.  A patched version of the software needs to
+applied to the systems, for the GOES projection.
+http://bradthemad.org/tech/notes/patching_rpms.php provides insight on
+how to do this.
 
 ```
 #!bash
@@ -42,37 +84,19 @@ Preparing...                ########################################### [100%]
    5:proj-debuginfo         ########################################### [100%]
 ```
 
-You now have a set of packages that can be installed in any matching redhat distribution.
+You now have a set of packages that can be installed in any matching
+redhat distribution.
  
-## debian
-
-Debian also includes the proj libraries, and require a patch of their
-own in order to get to work. The process is similar to the redhat
-methodology, but a bit more simple.  This uses quilting,
-http://wiki.debian.org/UsingQuilt#Using_quilt_with_Debian_source_packages
-as the methodology for adding the patch.  Note that below the
-qjhart.proj-goes-patch/proj-4.7.0/ directory contains some files in
-the src/ directory, but those are for info only, their source is
-included in the patch as well.
-
-```
-#!bash
-# Checkout the proj patch
-hg clone https://code.google.com/p/qjhart.proj-goes-patch/
-# Get the proj source
-apt-get source proj
-# Copy the patch to the debian/patch directory
-rsync -a -v qjhart.proj-goes-patch/proj-4.7.0/debian/patches/ ~/proj-4.7.0/debian/patches/
-# Build the package
-(cd proj-4.7.0; dpkg-buildpackage)
-# install these sources
-sudo dpkg --install *proj*.deb
-```
-
-
 # History
 
-Starting around 2003 the CSTARS program began modeling incoming solar radiation for California from GOES satellite data.  We manipulate the rasters using grass.  In order to project the GOES images into our projection scheme, we wrote a patch to proj, adding a goes projection  In 2012, with the launch of GOES15, we contacted NOAA, and they kindly sent us their C code from projecting GOES data, though it was more of a standalone program.  We, have incorporated their code for GOES instruments beyond GOES-11
+Starting around 2003 the CSTARS program began modeling incoming solar
+radiation for California from GOES satellite data.  We manipulate the
+rasters using grass.  In order to project the GOES images into our
+projection scheme, we wrote a patch to proj, adding a goes projection
+In 2012, with the launch of GOES15, we contacted NOAA, and they kindly
+sent us their C code from projecting GOES data, though it was more of
+a standalone program.  We, have incorporated their code for GOES
+instruments beyond GOES-11
 
 # Maintenance
 
