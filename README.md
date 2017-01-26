@@ -31,6 +31,9 @@ information form a GVAR file, with the *--proj* command-line.
 
 ## debian
 
+**NOTE** The debian version has not been compiled for pproj 4.8.0, so  I'm not sure these instructions are still valid.
+
+### proj-4.7
 The debian patch uses quilting,
 http://wiki.debian.org/UsingQuilt#Using_quilt_with_Debian_source_packages
 as the methodology for adding the patch.  Note that below the
@@ -52,6 +55,35 @@ sudo dpkg --install *proj*.deb
 
 ## RedHat
 
+### proj-4.8
+For proj-4.8, I included all the rpmbuild files, so you can just rsync these over
+
+``` bash
+# Checkout the proj patch
+git clone https://github.com/qjhart/qjhart.proj-goes-patch.git
+# First get the proj source and build environment
+mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
+#Setup your build environment ( this uses home directory)
+sudo yum install rpm-build redhat-rpm-config
+# Get the proj source and install
+yumdownloader --source proj
+rpm -ivh proj-4.7.0-2_0.el6.src.rpm
+# Copy the patch to the rpmbuild directory
+rsync ~/qjhart.proj-goes-patch/rpmbuild . -a -v 
+```
+Then build, You may have to install additional build tools, often ```yum install libtool``` will do the trick.
+```bash 
+rpmbuild -ba rpmbuild/SPECS/proj.spec
+```
+Finally, install
+``` bash
+sudo rpm -Uvh --force rpmbuild/RPMS/x86_64/proj-*.rpm
+```
+
+
+
+### proj-4.7
 We can use the same patch for the redhat patch.
 http://bradthemad.org/tech/notes/patching_rpms.php provides some insight on
 how to do this.
